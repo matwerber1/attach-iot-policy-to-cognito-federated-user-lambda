@@ -12,7 +12,7 @@ When a user signs up for a Cognito User Pool, you (the backend) do not have a wa
 
 At this time, there is no way to AWS SDK API to determine a CIP identity ID from a CUP user's username. Thus, you "normally" wouldn't know what identity ID to attach the IoT Policy to. Technically, you could allow the client app to provide the user's ID as a request parameter to an API to attach the policy, but you don't want to implicitly trust an arbitrary client-side input when dealing with the question of security policies. 
 
-However, there is a workaround. if an API Gateway API method is configured with IAM authentication and the API is invoked with IAM credentials from a federated Cognito Identity ID, the API request object created by API Gateway **does** contain the user's identity ID. This means we can use API Gateway + IAM authentication to attach the necessary IoT policy without relying on the client-side app to manually provide a potentially untrusted federated ID as a request parameter. 
+However, there is a secure, reliable, and easy workaround. if an API Gateway API method is configured with IAM authentication and the API is invoked with IAM credentials from a federated Cognito Identity ID, the API Gateway itself (not the client request parameters) will provide the user's identity ID. This means we can use API Gateway + IAM authentication to attach the necessary IoT policy without relying on the client-side app to manually provide a potentially untrusted federated ID as a request parameter. 
 
 ## Complete Workflow
 
