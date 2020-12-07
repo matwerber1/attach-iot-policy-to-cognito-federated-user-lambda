@@ -18,9 +18,9 @@ This project proposes a strategy to handle this client-side logic, which involve
 
 While this project only provides an example Lambda function, the steps below provide a reference for the complete solution:
 
-1. Create an API Gateway API with a method, such as GET /attachIoTPolicy and set the Authorization to AWS_IAM. ([see docs](https://aws.amazon.com/premiumsupport/knowledge-center/iam-authentication-api-gateway/))
+1. Create an API Gateway API with a method, such as **GET /attachIoTPolicy** and set the Authorization to `AWS_IAM`. ([see docs](https://aws.amazon.com/premiumsupport/knowledge-center/iam-authentication-api-gateway/))
 
-2. Configure the GET /attachIoTPolicy to invoke a Lambda function.
+2. Configure the **GET /attachIoTPolicy** to invoke a Lambda function.
 
 3. Grant the Cognito Identity Pool (CIP) Auth role permission to allow authenticated users to invoke the API method discussed. ([see docs](https://aws.amazon.com/premiumsupport/knowledge-center/iam-authentication-api-gateway/))
 
@@ -30,9 +30,9 @@ While this project only provides an example Lambda function, the steps below pro
 
 6. If IsIoTPolicyAttached is not "true", client app invokes the API from step 1. In order to do this, the client app must sign the request using the Cognito user’s federated identity pool credentials (aka access key, secret key, and session token). ([see docs](https://docs.aws.amazon.com/apigateway/api-reference/signing-requests/))
 
-7. When the Lambda is invoked by API Gateway, the event parameters passed to the Lambda are a JSON object that includes the event.requestContext.identity.cognitoIdentityPoolId, which provides the user's federated identity ID. Similarly, the event.requestContext.identity. cognitoAuthenticationProvider value can be parsed to determine the user's CUP user ID (aka sub in Cognito terminology).
+7. When the Lambda is invoked by API Gateway, the event parameters passed to the Lambda are a JSON object that includes the `event.requestContext.identity.cognitoIdentityPoolId`, which provides the user's federated identity ID. Similarly, the `event.requestContext.identity. cognitoAuthenticationProvider` value can be parsed to determine the user's CUP user ID (aka sub in Cognito terminology).
 
-8. Armed with the user’s federated identity ID and user pool ID, the Lambda can now use the iot.attachPolicy() AWS SDK method to attach the necessary IoT policy to the user’s federated Identity. Afterward, the Lambda should then update the user’s IsIoTPolicyAttached attribute to “true” using the UpdateUserAttributes API.
+8. Armed with the user’s federated identity ID and user pool ID, the Lambda can now use the `iot.attachPolicy()` AWS SDK method to attach the necessary IoT policy to the user’s federated Identity. Afterward, the Lambda should then update the user’s `iotPolicyIsAttached` custom attribute to `true` using the `AdminUpdateUserAttributes()` API.
 
 ## Lambda function code
 
