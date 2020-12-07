@@ -26,7 +26,7 @@ While this project only provides an example Lambda function, the steps below pro
 
 4. When a user signs in to the client app via Cognito User Pool (CUP), Cognito will return the user’s pool attributes (if any).
 
-5. Client app checks whether a user attribute, such as IsIoTPolicyAttached equals “true”.
+5. Client app checks whether a user attribute, such as `iotPolicyIsAttached` equals `true`.
 
 6. If the custom CUP user attribute `iotPolicyIsAttached` is not `true`, client app invokes the API from step 1. In order to do this, the client app must sign the request using the Cognito user’s federated identity pool credentials (aka access key, secret key, and session token). ([see docs](https://docs.aws.amazon.com/apigateway/api-reference/signing-requests/))
 
