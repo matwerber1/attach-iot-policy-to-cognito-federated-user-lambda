@@ -1,5 +1,8 @@
 # attach-iot-policy-to-cognito-federated-user-lambda
 
+This Lambda function must be invoked by a Cognito Federated User via API Gateway. 
+
+The function parses the event input from API Gateway to determine the user's federated identity ID and user pool ID, attaches an IoT policy to the user, and updates the user's user pool attributes to set ioTPolicyIsAttached = true. The client-side app inspect this user attribute value when the user signs in (or attempts to use AWS IoT) to determine whether or not this function needs to be invoked first.
 
 ## Example Event from API Gateway
 
