@@ -26,7 +26,7 @@ While this project only provides an example Lambda function, the steps below pro
 
 5. Client app checks whether a user attribute, such as IsIoTPolicyAttached equals “true”.
 
-6. If IsIoTPolicyAttached is not "true", client app invokes the API from step 1. In order to do this, the client app must sign the request using the Cognito user’s federated identity pool credentials (aka access key, secret key, and session token). ([see docs](https://docs.aws.amazon.com/apigateway/api-reference/signing-requests/))
+6. If the custom CUP user attribute `iotPolicyIsAttached` is not `true`, client app invokes the API from step 1. In order to do this, the client app must sign the request using the Cognito user’s federated identity pool credentials (aka access key, secret key, and session token). ([see docs](https://docs.aws.amazon.com/apigateway/api-reference/signing-requests/))
 
 7. When the Lambda is invoked by API Gateway, the event parameters passed to the Lambda are a JSON object that includes the `event.requestContext.identity.cognitoIdentityPoolId`, which provides the user's federated identity ID. Similarly, the `event.requestContext.identity. cognitoAuthenticationProvider` value can be parsed to determine the user's CUP user ID (aka sub in Cognito terminology).
 
