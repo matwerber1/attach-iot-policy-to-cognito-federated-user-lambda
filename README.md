@@ -1,6 +1,42 @@
 # attach-iot-policy-to-cognito-federated-user-lambda
 
-The function parses the event input from API Gateway to determine the user's federated identity ID and user pool ID, attaches an IoT policy to the user, and updates the user's user pool attributes to set `ioTPolicyIsAttached = true`. The client-side app inspect this user attribute value when the user signs in (or attempts to use AWS IoT) to determine whether or not this function needs to be invoked first.
+## Background
+
+This project exists to help users who are trying to integrate AWS IoT with Cognito Federated Identities. 
+
+When you create a Cognito User Pool (CUP) and set up Cognito Federated Identities (CIP), you specify an IAM role that will be assumed by authenticated users. Within this role, you can grant the users permission to interact with AWS IoT. However, this alone is not enough for the users to be able to publish and subscribe to AWS IoT MQTT topics. 
+
+In addition to the IAM role, a separate IoT Policy must be created and explicitly attached to each federated identity. Thus, you need a way to instrument this. 
+
+When a user signs up for a Cognito User Pool, you (the backend) do not have a way to create a federated identity for the user. Rather, your client application must explicitly invoke a Cognito Identity Pool endpoint to exchange the user pool access tokens for a CIP identity. If this is the first time the user has done so, a CIP identity ID will be created for the user. 
+
+At this time, there is no way to programmatically determine a CIP identity ID from a CUP user's username. Instead, the only way to determine the CIP ID is client-side, when the token exchange occurs. This means that the logic to attach the IoT Policy to the CIP ID must be initiated client-side. 
+
+This project proposes a strategy to handle this client-side logic, which involves API Gateway and a Lambda. This project provides the Lambda code. 
+
+## Complete Workflow
+
+While this project only provides an example Lambda function, the steps below provide a reference for the complete solution:
+
+1. Create an API Gateway API with a method, such as GET /attachIoTPolicy and set the Authorization to AWS_IAM. ([see docs](https://aws.amazon.com/premiumsupport/knowledge-center/iam-authentication-api-gateway/))
+
+2. Configure the GET /attachIoTPolicy to invoke a Lambda function.
+
+3. Grant the Cognito Identity Pool (CIP) Auth role permission to allow authenticated users to invoke the API method discussed. ([see docs](https://aws.amazon.com/premiumsupport/knowledge-center/iam-authentication-api-gateway/))
+
+4. When a user signs in to the client app via Cognito User Pool (CUP), Cognito will return the user’s pool attributes (if any).
+
+5. Client app checks whether a user attribute, such as IsIoTPolicyAttached equals “true”.
+
+6. If IsIoTPolicyAttached is not "true", client app invokes the API from step 1. In order to do this, the client app must sign the request using the Cognito user’s federated identity pool credentials (aka access key, secret key, and session token). ([see docs](https://docs.aws.amazon.com/apigateway/api-reference/signing-requests/))
+
+7. When the Lambda is invoked by API Gateway, the event parameters passed to the Lambda are a JSON object that includes the event.requestContext.identity.cognitoIdentityPoolId, which provides the user's federated identity ID. Similarly, the event.requestContext.identity. cognitoAuthenticationProvider value can be parsed to determine the user's CUP user ID (aka sub in Cognito terminology).
+
+8. Armed with the user’s federated identity ID and user pool ID, the Lambda can now use the iot.attachPolicy() AWS SDK method to attach the necessary IoT policy to the user’s federated Identity. Afterward, the Lambda should then update the user’s IsIoTPolicyAttached attribute to “true” using the UpdateUserAttributes API.
+
+## Lambda function code
+
+The function parses the event input from API Gateway to determine the user's Cognito federated identity ID and user pool ID, attaches an IoT policy to the user, and updates the user's user pool attributes to set `ioTPolicyIsAttached = true`. The client-side app inspect this user attribute value when the user signs in (or attempts to use AWS IoT) to determine whether or not this function needs to be invoked first.
 
 ## Prerequisites
 
@@ -11,6 +47,10 @@ The function parses the event input from API Gateway to determine the user's fed
 3. Your Cognito User Pool must have a custom boolean attribute named `iotPolicyIsAttached`. Or, you can use a different attribute name as long as you update the code.
 
 4. You must have an existing AWS IoT Policy that you want to attach to your users. Update the `IOT_POLICY` constant in the code to match your policy name. 
+
+## Credits
+
+I used [this helpful article from serverless-stack.com](https://serverless-stack.com/chapters/mapping-cognito-identity-id-and-user-pool-id.html) for part of this solution.
 
 ## Example function response / output logs
 
