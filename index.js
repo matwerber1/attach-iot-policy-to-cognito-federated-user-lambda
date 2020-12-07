@@ -26,7 +26,7 @@ exports.handler = async (event) => {
       var identityId = event.requestContext.identity.cognitoIdentityId;
       var cognitoAuthenticationProvider = event.requestContext.identity.cognitoAuthenticationProvider;
       
-      attachIoTPolicyToFederatedIdentity(IOT_POLICY, identityId);
+      await attachIoTPolicyToFederatedIdentity(IOT_POLICY, identityId);
       
       var { userPoolId, username } = await getUserPoolInfoFromAuthProviderString(cognitoAuthenticationProvider);
       await updateUserPoolAttribute(userPoolId, username);
