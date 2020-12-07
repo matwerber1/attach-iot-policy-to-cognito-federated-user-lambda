@@ -12,6 +12,32 @@ The function parses the event input from API Gateway to determine the user's fed
 
 4. You must have an existing AWS IoT Policy that you want to attach to your users. Update the `IOT_POLICY` constant in the code to match your policy name. 
 
+## Example function response / output logs
+
+```
+Response:
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*"
+  },
+  "body": "{\n  \"msg\": \"IoT Policy amplify-toolkit-iot-message-viewer attached to Cognito federated identity ID us-west-2:XXXXX-XXXXXX-XXXXXX-XXXXX\"\n}"
+}
+
+Request ID:
+"c987b3cd-cdeb-4f42-b275-0f7d11cd50dd"
+
+Function logs:
+START RequestId: c987b3cd-cdeb-4f42-b275-0f7d11cd50dd Version: $LATEST
+2020-12-07T19:59:40.496Z	c987b3cd-cdeb-4f42-b275-0f7d11cd50dd	INFO	Attaching amplify-toolkit-iot-message-viewer IoT policy to federated ID us-west-2:XXXXX-XXXXXX-XXXXXX-XXXXX...
+2020-12-07T19:59:40.904Z	c987b3cd-cdeb-4f42-b275-0f7d11cd50dd	INFO	Extracting Cognito user ID (aka 'sub') from auth string cognito-idp.us-west-2.amazonaws.com/us-west-2-XXXXXX,cognito-idp.us-west-2.amazonaws.com/us-west-2-XXXXXXXX:CognitoSignIn:1e10ff5b-XXXX-XXXXX-XXXXX-XXXXXXXXXXX...
+2020-12-07T19:59:40.904Z	c987b3cd-cdeb-4f42-b275-0f7d11cd50dd	INFO	Calling Cognito.listUsers() to find username from user ID 1e10ff5b-XXXX-XXXXX-XXXXX-XXXXXXXXXXX...
+2020-12-07T19:59:41.563Z	c987b3cd-cdeb-4f42-b275-0f7d11cd50dd	INFO	Username is mat@XXXXXX.com...
+2020-12-07T19:59:41.601Z	c987b3cd-cdeb-4f42-b275-0f7d11cd50dd	INFO	Setting user attribute custom:iotPolicyIsAttached to "true"...
+END RequestId: c987b3cd-cdeb-4f42-b275-0f7d11cd50dd
+REPORT RequestId: c987b3cd-cdeb-4f42-b275-0f7d11cd50dd	Duration: 1316.80 ms	Billed Duration: 1317 ms	Memory Size: 128 MB	Max Memory Used: 89 MB	Init Duration: 430.19 ms	
+```
+
 ## Example Event from API Gateway
 
 When API Gateway is configured with IAM authentication and a Cognito Federated Identity Pool identity invokes the API, the event that is passed to Lambda looks like this:
